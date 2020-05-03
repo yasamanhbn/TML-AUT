@@ -3,6 +3,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * this class read data from file and check whether string accepted or not
@@ -15,10 +16,12 @@ public class DFA {
     private String[] state;
     private String[] finiteState;
     private String startState;
-    private StateChanger[] stateChangers;
+    private ArrayList<StateChanger> stateChangers;
     private int stateCounter;
-    public DFA() {
-        stateChangers = new StateChanger[1000];
+    public DFA()
+    {
+        stateChangers = new ArrayList<StateChanger>();
+        stateCounter=0;
     }
 
     /**
@@ -26,8 +29,7 @@ public class DFA {
      * @throws IOException if doesn't find file or can't find it
      */
     public void readData() {
-        File file = new File("E:\\university\\theory of machines and languages\\HW1\\dfa.txt");
-        int counter = 0;
+        File file = new File(".\\DFA_Input_1.txt");
         try {
             BufferedReader br = new BufferedReader(new FileReader(file));
             String st;
@@ -45,44 +47,33 @@ public class DFA {
                 else
                     finiteState = st.split(" ");
             }
-            /**read remaining data and transform functions and create a stateChanger object
-            for each function and store it in stateChangers array**/
+            /*read remaining data and transform functions and create a stateChanger object
+            for each function and store it in stateChangers array*/
             while ((st = br.readLine()) != null) {
                 String[] s = st.split(" ");
                 StateChanger stCh = new StateChanger(s[0], s[1].charAt(0), s[2]);
-                stateChangers[counter] = stCh;
-                counter++;
+                stateChangers.add(stCh);
+                stateCounter++;
             }
-            stateCounter = counter-1;
         } catch (Exception e) {
             System.out.println(e);
         }
-    }
-
-    public void showData() {
-        for (String i : alphabet)
-            System.out.println("alphabet  " + i);
-        for (String i : state)
-            System.out.println("state  " + i);
-        System.out.println("startState  " + startState);
-        for (String i : finiteState)
-            System.out.println("finiteState  " + i);
     }
       /**
        * checkString method check whether myString accepted with dfa or not
         **/
     public Boolean checkString(String myString) {
         boolean check;
-        //read ol the string
+        //read all the string
         for (int i = 0; i < myString.length(); i++) {
             //this boolean is for checking whether string can continue or it isn't accepted
              check = false;
              //read all the transform function
-            for (int j=0;j<=stateCounter;j++){
+            for (int j=0;j<stateCounter;j++){
                 //if string can accepted with one of the state,I change the startState
-                if (stateChangers[j].getFirstState().equals(startState)) {
-                    if (stateChangers[j].getAlphabet() == myString.charAt(i)) {
-                        startState = stateChangers[j].getEndState();
+                if ((stateChangers.get(j)).getFirstState().equals(startState)) {
+                    if ((stateChangers.get(j)).getAlphabet() == myString.charAt(i)) {
+                        startState = stateChangers.get(j).getEndState();
                         check = true;
                         break;
                     }
