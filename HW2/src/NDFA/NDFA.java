@@ -59,10 +59,6 @@ public class NDFA {
         } catch (Exception e) {
             System.out.println(e);
         }
-        ArrayList<String> temp = closure("q0");
-        for(String s : temp){
-            System.out.println(s);
-        }
     }
     public ArrayList closure(String q){
         ArrayList<String> closure = new ArrayList<String>();
@@ -78,5 +74,44 @@ public class NDFA {
             }
         }
         return closure;
+    }
+
+    public void removeLanda() {
+       ArrayList<Transition> newTransition = new ArrayList<Transition>();
+        for (int i = 0; i < state.length; i++) {
+            ArrayList<String> temp = this.closure(state[i]);
+            for (int j = 0; j < alphabet.length; j++) {
+                ArrayList<String> endState = new ArrayList<>();
+                for (String s : temp) {
+                    for (Transition tt : transitions) {
+                        if (tt.getFirstState().equals(s) && tt.getAlphabet() == alphabet[j].charAt(0)) {
+                            endState.add(tt.getEndState());
+                        }
+                    }
+                }
+                for (String s : endState) {
+                    ArrayList<String> endClosure = this.closure(s);
+                    for (String ss : endClosure) {
+                        Transition transition = new Transition(state[i], alphabet[j].charAt(0), ss);
+                        if(!isDuplicated(transition,newTransition))
+                            newTransition.add(transition);
+                    }
+                }
+            }
+        }
+        for (Transition t : newTransition) {
+            System.out.println(t.getFirstState() + "  " + t.getAlphabet() + "  " + t.getEndState());
+        }
+    }
+    private boolean isDuplicated(Transition transition,ArrayList<Transition> newTransition){
+        boolean check=false;
+        for(Transition t: newTransition){
+            if(t.getAlphabet()==transition.getAlphabet() &&
+            t.getFirstState().equals(transition.getFirstState())&&
+            t.getEndState().equals(transition.getEndState())){
+                    check = true;
+            }
+        }
+        return check;
     }
 }
