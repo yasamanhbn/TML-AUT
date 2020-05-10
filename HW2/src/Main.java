@@ -6,5 +6,10 @@ public class Main {
          NDFA ndfa = new NDFA();
          ndfa.readData();
          ndfa.removeLanda();
+         if(ndfa.isLanda()){
+             ndfa.removeLanda();
+         }
+         ndfa.findNewDFAState();
+         ndfa.NFATransition();
     }
 }
