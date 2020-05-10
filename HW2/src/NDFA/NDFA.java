@@ -3,7 +3,13 @@ package NDFA;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
+
+/**
+ * this class first convert λ-NFA to NFA and after that convert it to DFA
+ *  * @author Yasaman Haghbin
+ *  * @since 2020
+ *  * @version 1.0
+ */
 
 public class NDFA {
     private String[] alphabet;
@@ -24,7 +30,6 @@ public class NDFA {
 
     /**
      * readData method read data from file and determine start state, final state, alphabet and states;
-     *
      * @throws IOException if doesn't find file or can't find it
      */
     public void readData() {
@@ -56,6 +61,7 @@ public class NDFA {
             while ((st = br.readLine()) != null) {
                 String[] s = st.split(" ");
                 Transition stCh = new Transition(s[0], s[1].charAt(0), s[2]);
+                //check whether we have λ in transitions or not
                 if (s[1].charAt(0) == 'λ') {
                     landa = true;
                     lanaTransitions.add(stCh);
@@ -68,14 +74,22 @@ public class NDFA {
         }
     }
 
+    /**
+     * This method find closure of input state
+     * @param q is state which we want to find is closure
+     * @return array contains closure of q
+     */
     private ArrayList closure(String q) {
         ArrayList<String> closure = new ArrayList<String>();
+        //each state's closure contains itSelf
         closure.add(q);
+        //iterate through lanaTransitions to find states which we reach with λ
         for (int j = 0; j < stateCounter; j++) {
             for (Transition t : lanaTransitions) {
                 if (t.getFirstState().equals(q)) {
                     if (!closure.contains(t.getEndState())) {
                         closure.add(t.getEndState());
+                        //q becomes new state with reading λ
                         q = t.getEndState();
                     }
                 }
@@ -84,11 +98,17 @@ public class NDFA {
         return closure;
     }
 
+    /**
+     * This method convert λ-NFA to NFA and set new transition and finalState
+     */
     public void removeLanda() {
         ArrayList<Transition> newTransition = new ArrayList<Transition>();
         ArrayList<String> finiteStateTemp = new ArrayList<String>();
+        //for each state first find it's closure. after that find all transition with specific alphabet
+        //after find all endState, we find closure of this endState
         for (int i = 0; i < state.size(); i++) {
             ArrayList<String> temp = this.closure(state.get(i));
+            //find finiteState for these transitions
             for (String st : finiteState) {
                 if (temp.contains(st)) {
                     if (!finiteState.contains(state.get(i)) && !finiteStateTemp.contains(state.get(i))) {
@@ -108,6 +128,7 @@ public class NDFA {
                 for (String s : endState) {
                     ArrayList<String> endClosure = this.closure(s);
                     for (String ss : endClosure) {
+                        //check if transition are duplicate, don't add it again to transitions arrayList
                         Transition transition = new Transition(state.get(i), alphabet[j].charAt(0), ss);
                         if (!isDuplicated(transition, newTransition))
                             newTransition.add(transition);
@@ -116,15 +137,15 @@ public class NDFA {
             }
         }
         transitions = newTransition;
-//        for (Transition t : newTransition) {
-//            System.out.println(t.getFirstState() + "  " + t.getAlphabet() + "  " + t.getEndState());
-//        }
         finiteState.addAll(finiteStateTemp);
-//        for(String s: finiteState){
-//            System.out.println(s);
-//        }
     }
 
+    /**
+     * This method check duplicate transition
+     * @param transition is transition which we want to know is duplicate or not
+     * @param newTransition is transition's arrayList
+     * @return a boolean which determined transition is duplicate or not
+     */
     private boolean isDuplicated(Transition transition, ArrayList<Transition> newTransition) {
         boolean check = false;
         for (Transition t : newTransition) {
@@ -161,14 +182,14 @@ public class NDFA {
         state = tempState;
     }
 
-    public boolean isLanda() {
-        return landa;
-    }
-
+    /**
+     * NFATransition method convert NFA to DFA
+     */
     public void NFATransition(){
         String[] temp;
         ArrayList<Transition> tempTransitions = new ArrayList<>();
         String endState="";
+        //find all transition for newState for each alphabet
         for(String stateName : state){
             temp = stateName.split("-");
             for(int i =0 ;i<alphabet.length;i++){
@@ -181,6 +202,7 @@ public class NDFA {
                         }
                     }
                 }
+            //add new Transition to our array
             if(!endState.equals("")) {
                 Transition t = new Transition(stateName, alphabet[i].charAt(0), endState.replace("-",""));
                 tempTransitions.add(t);
@@ -190,9 +212,11 @@ public class NDFA {
         }
         transitions = tempTransitions;
     }
+
+    /**
+     * showTransition method write result in output file
+     */
     public void showTransition(){
-//        System.out.println("firstState:"+t.getFirstState().replace("-","") + " alphabet:" + t.getAlphabet()
-//                +"  endState:" + t.getEndState());
         try {
             PrintWriter writer = new PrintWriter(new FileOutputStream(".\\DFA_Output _2.txt"));
             for(int i=0;i<alphabet.length;i++)
@@ -217,5 +241,8 @@ public class NDFA {
         catch (IOException e){
             System.out.println(e);
         }
+    }
+    public boolean isLanda() {
+        return landa;
     }
 }

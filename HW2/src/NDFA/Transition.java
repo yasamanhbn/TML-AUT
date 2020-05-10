@@ -1,5 +1,10 @@
 package NDFA;
-
+/**
+ * this class contains transition's data
+ *  * @author Yasaman Haghbin
+ *  * @since 2020
+ *  * @version 1.0
+ */
 public class Transition {
 
     private String firstState;
