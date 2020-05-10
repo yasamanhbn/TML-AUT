@@ -1,9 +1,6 @@
 package NDFA;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -176,30 +173,49 @@ public class NDFA {
             temp = stateName.split("-");
             for(int i =0 ;i<alphabet.length;i++){
             for(String st : temp){
-                if(finiteState.contains(st) && !finiteState.contains(stateName))
-                    finiteState.add(stateName);
+                if(finiteState.contains(st) && !finiteState.contains(stateName.replace("-","")))
+                    finiteState.add(stateName.replace("-",""));
                     for(Transition transition : transitions){
-                        if(transition.getFirstState().equals(st) && transition.getAlphabet()==alphabet[i].charAt(0)){
+                        if(transition.getFirstState().equals(st) && transition.getAlphabet()==alphabet[i].charAt(0) && !endState.contains(transition.getEndState())){
                             endState += (transition.getEndState() + "-");
                         }
                     }
                 }
             if(!endState.equals("")) {
-                Transition t = new Transition(stateName, alphabet[i].charAt(0), endState);
+                Transition t = new Transition(stateName, alphabet[i].charAt(0), endState.replace("-",""));
                 tempTransitions.add(t);
             }
-//                System.out.println("fist: "+stateName+" alpha:"+alphabet[i]+" end:"+endState);
                 endState="";
             }
         }
         transitions = tempTransitions;
-        for(Transition t:transitions)
-            showTransition(t);
-//        for(String s: finiteState)
-//            System.out.println("finiteState:" + s);
     }
-    public void showTransition(Transition t){
-        System.out.println("firstState:"+t.getFirstState().replace("-","") + " alphabet:" + t.getAlphabet()
-                +"  endState:" + t.getEndState().replace("-",""));
+    public void showTransition(){
+//        System.out.println("firstState:"+t.getFirstState().replace("-","") + " alphabet:" + t.getAlphabet()
+//                +"  endState:" + t.getEndState());
+        try {
+            PrintWriter writer = new PrintWriter(new FileOutputStream(".\\DFA_Output _2.txt"));
+            for(int i=0;i<alphabet.length;i++)
+                writer.print(alphabet[i]+" ");
+            writer.println();
+            writer.flush();
+            for(String st : state)
+                writer.print(st.replace("-","")+" ");
+            writer.println();
+            writer.flush();
+            writer.println(startState);
+            for(String s : finiteState)
+                writer.print(s+" ");
+            writer.println();
+            writer.flush();
+            for(Transition t:transitions){
+                writer.println(t.getFirstState().replace("-","")+ " "+t.getAlphabet()+" "+t.getEndState());
+            }
+            writer.flush();
+            writer.close();
+        }
+        catch (IOException e){
+            System.out.println(e);
+        }
     }
 }

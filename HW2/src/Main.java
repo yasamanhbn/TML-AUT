@@ -11,5 +11,6 @@ public class Main {
          }
          ndfa.findNewDFAState();
          ndfa.NFATransition();
+         ndfa.showTransition();
     }
 }
