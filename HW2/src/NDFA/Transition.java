@@ -23,7 +23,7 @@ public class Transition {
         return endState;
     }
 
-    public Transition(String firstState, char alphabet, String endState) {
+    Transition(String firstState, char alphabet, String endState) {
         this.firstState = firstState;
         this.alphabet = alphabet;
         this.endState = endState;
